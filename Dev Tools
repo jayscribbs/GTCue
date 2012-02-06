@@ -1,0 +1,5 @@
+C++/Make: build-essential
+autotools: automake autoconf libtool
+jack: libjack-jackd2-dev
+sndfile: libsnddfile1-dev
+gtkmm: libgtkmm-3.0-dev
