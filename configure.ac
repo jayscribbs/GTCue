@@ -14,8 +14,8 @@ AC_PROG_CXX
 PKG_CHECK_MODULES([GTCUE],[gtkmm-3.0 >= 3.2.0] [sndfile >= 1.0.24] [jack >= 1.9.7]) 
 
 #Set compilation flags
-CFLAGS="$CFLAGS $GTCUE_CFLAGS"
-LIBS="$LIBS $GTCUE_LIBS"
+#CFLAGS=$GTCUE_CFLAGS
+#LIBS=$GTCUE_LIBS
 
 AC_CONFIG_FILES([Makefile])
 

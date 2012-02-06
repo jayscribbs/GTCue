@@ -1,3 +1,6 @@
+Ubuntu packages needed to build GTCue
+apt-get will resolve additional dependencies
+
 C++/Make: build-essential
 autotools: automake autoconf libtool
 jack: libjack-jackd2-dev
