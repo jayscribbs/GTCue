@@ -1,0 +1,8 @@
+Build Dependencies (for Ubuntu):
+build-essential
+automake
+autoconf
+libtool
+libgtkmm-3.0-dev
+libsndfile1
+libjack-dev
