@@ -2,6 +2,13 @@
 
 #include "JackClient.h"
 
+//////////////////////////////////////////////////////////////////
+// Static Callback that delegates to a member function
+int _JACK_CALLBACK_(jack_nframes_t frames, void * arg) {
+	return static_cast<JackClient*>(arg)->jackProcess(frames);
+}
+//////////////////////////////////////////////////////////////////
+
 // Constructor
 JackClient::JackClient (const char * name,
 	jack_options_t options,
@@ -27,7 +34,9 @@ JackClient::JackClient (const char * name,
 		// Exception
 	}
 
-	jack_set_process_callback (jackClientHandle, jackProcess, 0);
+	jack_set_process_callback (jackClientHandle, _JACK_CALLBACK_, this);
+
+	jack_activate(jackClientHandle);
 }
 
 // Destructor
@@ -41,7 +50,7 @@ void JackClient::jackShutdown(void * arg) {
         // Exceptions
 }
 
-int JackClient::jackProcess(jack_nframes_t nframes, void * arg) {
+int JackClient::jackProcess(jack_nframes_t nframes) {
 	
 	// Do not waste resources if no file is cued
 	// or we are paused
@@ -90,6 +99,7 @@ bool JackClient::cueFile(const char * path) {
 	if (sndfileinfo.channels != 2) {} // Handle mono to stereo here?
 
 	// Allocate HUGE memory for the file to be cued FIXME: Double?
+	// FIXME: Would it be better to be multithreaded and buffer from disk?
 	cueBufferPtr = new float[sndfileinfo.frames * sndfileinfo.channels];
 
 	// Transfer the cued file to memory

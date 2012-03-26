@@ -22,7 +22,7 @@ class JackClient {
 
 		// Jack callback handlers
 		void jackShutdown(void * arg);
-		int jackProcess(jack_nframes_t nframes, void * arg);
+		int jackProcess(jack_nframes_t nframes);
 
 		//File handling/cueing
 		bool cueFile(const char * path);
