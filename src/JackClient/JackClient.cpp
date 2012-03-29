@@ -12,9 +12,11 @@ int _JACK_CALLBACK_(jack_nframes_t frames, void * arg) {
 // Constructor
 JackClient::JackClient (const char * name,
 	jack_options_t options,
-	jack_status_t * status) : 
+	jack_status_t * status,
+	Configuration * conf) : 
 	playback(false),
-	fileCued(false) {
+	fileCued(false),
+	config(conf) {
 
 	// Open the jack client
 	if ( (jackClientHandle = jack_client_open(name, options, status)) == NULL) {

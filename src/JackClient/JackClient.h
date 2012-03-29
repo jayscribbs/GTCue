@@ -4,8 +4,9 @@
 #ifndef JACKCLIENT_H
 #define JACKCLIENT_H
 
-#include<jack/jack.h>
-#include<sndfile.h>
+#include <jack/jack.h>
+#include "../Configuration.h"
+#include <sndfile.h>
 
 using namespace std;
 
@@ -15,7 +16,8 @@ class JackClient {
 		// Constructor
 		JackClient(const char * name,
 			jack_options_t options,
-			jack_status_t * status);
+			jack_status_t * status,
+			Configuration * conf);
 
 		// Destructor
 		~JackClient();
@@ -42,6 +44,9 @@ class JackClient {
 		SNDFILE * sndfile;
 		SF_INFO sndfileinfo;
 		int position;
+
+		//Configuration Object Pointer
+		Configuration * config;
 		
 		// Various flags
 		bool playback;
