@@ -3,7 +3,6 @@
 #include "Configuration.h"
 #include <fstream>
 #include <string>
-#include <iostream>
 #include <glibmm/fileutils.h>
 #include <glibmm/miscutils.h>
 

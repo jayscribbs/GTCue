@@ -1,6 +1,7 @@
 // Jack Client class definition
 
 #include "JackClient.h"
+#include <jack/midiport.h>
 
 //////////////////////////////////////////////////////////////////
 // Static Callback that delegates to a member function
@@ -32,7 +33,11 @@ JackClient::JackClient (const char * name,
 					"Stereo Out Right",
 					JACK_DEFAULT_AUDIO_TYPE,
 					JackPortIsOutput, 0);
-	if (leftPort == 0 || rightPort == 0) {
+	midiPort = jack_port_register (jackClientHandle,
+					"MIDI Input",
+					JACK_DEFAULT_MIDI_TYPE,
+					JackPortIsInput, 0);
+	if (leftPort == 0 || rightPort == 0 || midiPort == 0) {
 		// Exception
 	}
 
@@ -80,6 +85,9 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 		}
 	}
 
+	// Handle any MIDI events
+	handleMidi(nframes);
+
 	return 0;
 }
 
@@ -123,4 +131,25 @@ void JackClient::setPause() {
 
 void JackClient::setPlay() {
 	playback = true;
+}
+
+void JackClient::handleMidi(jack_nframes_t nframes) {
+	jack_nframes_t ctr, frameCount;
+	void * buffer;
+
+	if (!(buffer = jack_port_get_buffer (midiPort, nframes))) return;
+	
+	frameCount = jack_midi_get_event_count (buffer);
+
+	for (ctr = 0; ctr < frameCount; ctr++) {
+		jack_midi_event_t event;
+
+		// Get the events and process individually
+		// a program change will require us to grab the
+		// follow on control change to pick the correct programMap
+		if (!(jack_midi_event_get (&event, buffer, ctr))) {
+			// process control change message
+
+		}
+	}
 }

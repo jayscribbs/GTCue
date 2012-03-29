@@ -33,11 +33,19 @@ class JackClient {
 		void setPause();
 		void setPlay();
 
+		// MIDI processing
+		void handleMidi(jack_nframes_t nframes);
+
 	protected:
 		// Jack client details
 		jack_client_t * jackClientHandle;
+
+		// Audio Ports
 		jack_port_t * leftPort;
 		jack_port_t * rightPort;
+
+		// MIDI Port
+		jack_port_t * midiPort;
 
 		// Buffer control and libsndfile data
 		float * cueBufferPtr;
