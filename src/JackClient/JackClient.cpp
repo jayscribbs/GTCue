@@ -17,6 +17,7 @@ JackClient::JackClient (const char * name,
 	Configuration * conf) : 
 	playback(false),
 	fileCued(false),
+	learningMidi(false),
 	config(conf) {
 
 	// Open the jack client
@@ -44,6 +45,8 @@ JackClient::JackClient (const char * name,
 	jack_set_process_callback (jackClientHandle, _JACK_CALLBACK_, this);
 
 	jack_activate(jackClientHandle);
+
+	cueFile(config->programMap[config->currentIndex][config->currentProgram].c_str());
 }
 
 // Destructor
@@ -62,7 +65,6 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 	// Do not waste resources if no file is cued
 	// or we are paused
 	if (fileCued && playback) {
-//		jack_default_audio_sample_t jackBuffer[sndfileinfo.channels];
 		jack_default_audio_sample_t * outputLeft;
 		jack_default_audio_sample_t * outputRight;
 		
@@ -93,6 +95,8 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 
 // File Handling
 bool JackClient::cueFile(const char * path) {
+	
+	if (path == "EMPTY") return false;
 	
 	// Stop playback
 	this->setPause();
@@ -133,6 +137,11 @@ void JackClient::setPlay() {
 	playback = true;
 }
 
+void JackClient::togglePlay() {
+	if (playback) setPause();
+	else setPlay();
+}
+
 void JackClient::handleMidi(jack_nframes_t nframes) {
 	jack_nframes_t ctr, frameCount;
 	void * buffer;
@@ -145,11 +154,41 @@ void JackClient::handleMidi(jack_nframes_t nframes) {
 		jack_midi_event_t event;
 
 		// Get the events and process individually
-		// a program change will require us to grab the
-		// follow on control change to pick the correct programMap
 		if (!(jack_midi_event_get (&event, buffer, ctr))) {
-			// process control change message
+			if (event.size == 0) break;
 
+			int type = event.buffer[0] & 0xf0;
+
+			// Control Change
+			if (type == 0xb0) {
+				// Toggle playback if this is a learned CC
+				if (event.buffer[1] == config->learnedMidiControl[0] &&
+					event.buffer[2] == config->learnedMidiControl[1])
+					togglePlay();
+
+				// Store the MSB for indexing if this is a CC#0 message
+				if (event.buffer[1] == 0x00) bankIndex = event.buffer[2];
+
+				// Learn a new CC
+				if (learningMidi) {
+					config->learnedMidiControl[0] = event.buffer[1];
+					config->learnedMidiControl[1] = event.buffer[2];
+					toggleLearningMidi();
+					config->saveConfig();
+				}
+			}
+			
+			// Program Change
+			if (type == 0xc0) {
+				cueFile(config->programMap[bankIndex][event.buffer[1]].c_str());
+				config->currentIndex = bankIndex;
+				config->currentProgram = event.buffer[1];
+				config->saveConfig();
+			}
 		}
 	}
+}
+
+void JackClient::toggleLearningMidi() {
+	learningMidi = true ? learningMidi = false : learningMidi = true;
 }

@@ -28,6 +28,11 @@ bool Configuration::loadConfig() {
 		return false;
 	}
 
+	f>>currentIndex;
+	f>>currentProgram;
+	f>>learnedMidiControl[0];
+	f>>learnedMidiControl[1];
+
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 100; j++) {
 			f>>programMap[i][j];
@@ -41,6 +46,12 @@ bool Configuration::loadConfig() {
 bool Configuration::saveConfig() {
 	ofstream f (path.c_str());
 	if (!f.is_open()) return false;
+
+	f<<currentIndex<<endl;
+	f<<currentProgram<<endl;
+	f<<learnedMidiControl[0]<<endl;
+	f<<learnedMidiControl[1]<<endl;
+
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 100; j++) {
 			f<<programMap[i][j]<<endl;

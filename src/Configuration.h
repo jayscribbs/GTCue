@@ -18,9 +18,13 @@ class Configuration {
 		bool loadConfig();
 		bool saveConfig();
 
+		char learnedMidiControl[2];
+		string programMap[4][100];
+		int currentIndex;
+		int currentProgram;
+
 	protected:
 		string path;
-		string programMap[4][100];
 };
 
 #endif

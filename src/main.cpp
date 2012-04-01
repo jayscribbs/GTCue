@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
   Configuration * config = new Configuration("GTCueConfig");
 
   JackClient * jc= new JackClient("GTCue", JackNullOption, NULL, config);
-  jc->cueFile("/home/josh/Desktop/MProj/Backing/ImYours.wav");
   jc->setPlay();
 
   MainWindow window;

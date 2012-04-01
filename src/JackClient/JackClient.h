@@ -32,9 +32,11 @@ class JackClient {
 		// Set methods for playback
 		void setPause();
 		void setPlay();
+		void togglePlay();
 
 		// MIDI processing
 		void handleMidi(jack_nframes_t nframes);
+		void toggleLearningMidi();
 
 	protected:
 		// Jack client details
@@ -44,8 +46,9 @@ class JackClient {
 		jack_port_t * leftPort;
 		jack_port_t * rightPort;
 
-		// MIDI Port
+		// MIDI Port and Indexes
 		jack_port_t * midiPort;
+		char bankIndex;
 
 		// Buffer control and libsndfile data
 		float * cueBufferPtr;
@@ -59,6 +62,7 @@ class JackClient {
 		// Various flags
 		bool playback;
 		bool fileCued;
+		bool learningMidi;
 };
 
 #endif
