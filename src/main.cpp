@@ -13,9 +13,8 @@ int main(int argc, char *argv[])
   Configuration * config = new Configuration("GTCueConfig");
 
   JackClient * jc= new JackClient("GTCue", JackNullOption, NULL, config);
-  jc->setPlay();
 
-  MainWindow window;
+  MainWindow window(jc, config);
 
   Gtk::Main::run(window);
 

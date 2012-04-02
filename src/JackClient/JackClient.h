@@ -8,8 +8,6 @@
 #include "../Configuration.h"
 #include <sndfile.h>
 
-using namespace std;
-
 class JackClient {
 
 	public:
@@ -37,6 +35,7 @@ class JackClient {
 		// MIDI processing
 		void handleMidi(jack_nframes_t nframes);
 		void toggleLearningMidi();
+		bool isLearning();
 
 	protected:
 		// Jack client details

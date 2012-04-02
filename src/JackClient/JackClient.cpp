@@ -61,13 +61,25 @@ void JackClient::jackShutdown(void * arg) {
 }
 
 int JackClient::jackProcess(jack_nframes_t nframes) {
-	
 	// Do not waste resources if no file is cued
 	// or we are paused
+
+	jack_default_audio_sample_t * outputLeft;
+	jack_default_audio_sample_t * outputRight;
+
+	if (!playback) {
+		outputLeft = static_cast<jack_default_audio_sample_t *> (
+				jack_port_get_buffer (leftPort, nframes));
+		outputRight = static_cast<jack_default_audio_sample_t *> (
+				jack_port_get_buffer (rightPort, nframes));
+
+		for (int i = 0; i < nframes; i++) {
+			outputLeft[i] = 0;
+			outputRight[i] = 0;
+		}
+	}
+
 	if (fileCued && playback) {
-		jack_default_audio_sample_t * outputLeft;
-		jack_default_audio_sample_t * outputRight;
-		
 		// Find out what we can write to jackd
 		outputLeft = static_cast<jack_default_audio_sample_t *> (
 				jack_port_get_buffer (leftPort, nframes));
@@ -95,9 +107,6 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 
 // File Handling
 bool JackClient::cueFile(const char * path) {
-	
-	if (path == "EMPTY") return false;
-	
 	// Stop playback
 	this->setPause();
 
@@ -108,6 +117,7 @@ bool JackClient::cueFile(const char * path) {
 	sndfileinfo.format = 0;
 	if ((sndfile = sf_open(path, SFM_READ, &sndfileinfo)) == NULL) {
 		// Exception
+		return false;
 	}
 	
 	if (sndfileinfo.channels != 2) {} // Handle mono to stereo here?
@@ -190,5 +200,10 @@ void JackClient::handleMidi(jack_nframes_t nframes) {
 }
 
 void JackClient::toggleLearningMidi() {
-	learningMidi = true ? learningMidi = false : learningMidi = true;
+	if (learningMidi) learningMidi = false;
+	else learningMidi = true;
+}
+
+bool JackClient::isLearning() {
+	return learningMidi;
 }
