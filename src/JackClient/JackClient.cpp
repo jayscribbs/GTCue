@@ -105,18 +105,24 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 	return 0;
 }
 
+#include <iostream>
+using namespace std;
 // File Handling
 bool JackClient::cueFile(const char * path) {
 	// Stop playback
 	this->setPause();
 
 	// Free any previous cues/memory
-	if (fileCued) delete cueBufferPtr;
+	if (fileCued) {
+		delete cueBufferPtr;
+		fileCued = false;
+	}
 
 	// Open the new file to cue
 	sndfileinfo.format = 0;
 	if ((sndfile = sf_open(path, SFM_READ, &sndfileinfo)) == NULL) {
 		// Exception
+		cout<<"OUCH!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
 		return false;
 	}
 	

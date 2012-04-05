@@ -27,7 +27,7 @@ MainWindow::MainWindow (JackClient * jc, Configuration * conf) :
 	// Set up the window
 	set_title("GT-10 Backing Track Cue");
 	set_border_width(10);
-	set_default_size(5, 5);
+	set_default_size(640, 280);
 
 	updateText();
 
@@ -102,8 +102,6 @@ void MainWindow::newFileButtonClicked() {
 
 void MainWindow::midiButtonClicked() {
 	jackClient->toggleLearningMidi();
-	if (jackClient->isLearning()) midiButton.set_label("Learning Midi");
-	else midiButton.set_label("Not Learning Midi");
 }
 
 bool MainWindow::updateText() {
@@ -116,36 +114,56 @@ bool MainWindow::updateText() {
 	programLabel.set_text(b.str());
 	currentFileLabel.set_text(config->programMap[config->currentIndex][config->currentProgram]);
 	
-	int d[4] = {4, 1, 2, 3};
+	int d[25][4];
+	int ctr = 0;
+
+	for (int i = 0; i < 25; i++) {
+		for (int j = 0; j < 4; j++) {
+			d[i][j] = ctr;
+			ctr++;
+		}
+	}		
 
 	c<<"Bank ";
 	switch (config->currentIndex) {
 		case 0:
-			if (config->currentProgram % 4 || config->currentProgram < 4)
-				c<<"U"<<(config->currentProgram/4)+1;
-			else c<<"U"<<(config->currentProgram/4);
-			c<<" Patch "<<d[(config->currentProgram % 4)];
+			for (int i = 0; i < 25; i++) {
+				for (int j = 0; j < 4; j++) {
+					if (config->currentProgram == d[i][j])
+						c<<"U"<<i+1<<" Patch "<<j+1;
+				}
+			}
 			break;
 		case 1:
-			if (config->currentProgram % 4 || config->currentProgram < 4)
-				c<<"U"<<(config->currentProgram/4)+26;
-			else c<<"U"<<(config->currentProgram/4)+25;
-			c<<" Patch "<<d[(config->currentProgram % 4)];
+			for (int i = 0; i < 25; i++) {
+				for (int j = 0; j < 4; j++) {
+					if (config->currentProgram == d[i][j])
+						c<<"U"<<i+26<<" Patch "<<j+1;
+				}
+			}
 			break;
 		case 2:
-			if (config->currentProgram % 4 || config->currentProgram < 4)
-				c<<"P"<<(config->currentProgram/4)+1;
-			else c<<"P"<<(config->currentProgram/4);
-			c<<" Patch "<<d[(config->currentProgram % 4)];
+			for (int i = 0; i < 25; i++) {
+				for (int j = 0; j < 4; j++) {
+					if (config->currentProgram == d[i][j])
+						c<<"P"<<i+1<<" Patch "<<j+1;
+				}
+			}
 			break;
 		case 3:
-			if (config->currentProgram % 4 || config->currentProgram < 4)
-				c<<"P"<<(config->currentProgram/4)+26;
-			else c<<"P"<<(config->currentProgram/4)+25;
-			c<<" Patch "<<d[(config->currentProgram % 4)];
-			break;	}
+			for (int i = 0; i < 25; i++) {
+				for (int j = 0; j < 4; j++) {
+					if (config->currentProgram == d[i][j])
+						c<<"P"<<i+26<<" Patch "<<j+1;
+				}
+			}
+			break;
+	}
 
-	bankLabel.set_text(c.str());	
+	bankLabel.set_text(c.str());
+
+	if (jackClient->isLearning()) midiButton.set_label("Learning Midi");
+	else midiButton.set_label("Not Learning Midi");
 
 	while (Gtk::Main::events_pending())
 		Gtk::Main::iteration(false);
