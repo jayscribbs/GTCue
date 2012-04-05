@@ -105,8 +105,6 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 	return 0;
 }
 
-#include <iostream>
-using namespace std;
 // File Handling
 bool JackClient::cueFile(const char * path) {
 	// Stop playback
@@ -122,7 +120,6 @@ bool JackClient::cueFile(const char * path) {
 	sndfileinfo.format = 0;
 	if ((sndfile = sf_open(path, SFM_READ, &sndfileinfo)) == NULL) {
 		// Exception
-		cout<<"OUCH!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
 		return false;
 	}
 	
