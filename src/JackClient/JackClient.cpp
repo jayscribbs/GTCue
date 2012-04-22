@@ -67,18 +67,6 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 	jack_default_audio_sample_t * outputLeft;
 	jack_default_audio_sample_t * outputRight;
 
-	if (!playback) {
-		outputLeft = static_cast<jack_default_audio_sample_t *> (
-				jack_port_get_buffer (leftPort, nframes));
-		outputRight = static_cast<jack_default_audio_sample_t *> (
-				jack_port_get_buffer (rightPort, nframes));
-
-		for (int i = 0; i < nframes; i++) {
-			outputLeft[i] = 0;
-			outputRight[i] = 0;
-		}
-	}
-
 	if (fileCued && playback) {
 		// Find out what we can write to jackd
 		outputLeft = static_cast<jack_default_audio_sample_t *> (
@@ -92,10 +80,22 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 			position++;
 			outputRight[i] = cueBufferPtr[position];
 			position++;
-			if (position == sndfileinfo.frames * sndfileinfo.channels) {
+			if (position >= (sndfileinfo.frames * sndfileinfo.channels)) {
 				this->setPause();
 				position = 0;
 			}
+		}
+	}
+
+	if (!playback) {
+		outputLeft = static_cast<jack_default_audio_sample_t *> (
+				jack_port_get_buffer (leftPort, nframes));
+		outputRight = static_cast<jack_default_audio_sample_t *> (
+				jack_port_get_buffer (rightPort, nframes));
+
+		for (int i = 0; i < nframes; i++) {
+			outputLeft[i] = 0;
+			outputRight[i] = 0;
 		}
 	}
 
@@ -209,4 +209,17 @@ void JackClient::toggleLearningMidi() {
 
 bool JackClient::isLearning() {
 	return learningMidi;
+}
+
+int JackClient::getPosition() {
+	return position;
+}
+
+void JackClient::setPosition(int value) {
+	if (value > getLength()) return;
+	position = value;
+}
+
+int JackClient::getLength() {
+	return sndfileinfo.frames * sndfileinfo.channels;
 }

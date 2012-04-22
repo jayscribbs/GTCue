@@ -21,6 +21,9 @@ class MainWindow : public Gtk::Window {
 		void newFileButtonClicked();
 		void midiButtonClicked();
 
+		// Scale change method
+		bool scaleChanged(Gtk::ScrollType scroll, double value);
+
 	protected:
 		JackClient * jackClient;
 		Configuration * config;
@@ -50,6 +53,8 @@ class MainWindow : public Gtk::Window {
 				programLabel,
 				currentFileLabel,
 				bankLabel;
-};
 
+		//Scale
+		Gtk::Scale	positionScale;
+};		
 #endif

@@ -27,7 +27,10 @@ class JackClient {
 		//File handling/cueing
 		bool cueFile(const char * path);
 
-		// Set methods for playback
+		// Get/Set methods for playback
+		int getPosition();
+		void setPosition(int value);
+		int getLength();
 		void setPause();
 		void setPlay();
 		void togglePlay();

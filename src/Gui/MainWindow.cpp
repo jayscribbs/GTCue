@@ -22,7 +22,8 @@ MainWindow::MainWindow (JackClient * jc, Configuration * conf) :
 	hbox2(Gtk::ORIENTATION_HORIZONTAL, 5),
 	playButton("Play/Pause"),
 	newFileButton("New File This Patch"),
-	midiButton("Not Learning Midi") {
+	midiButton("Not Learning Midi"),	
+	positionScale(Gtk::ORIENTATION_HORIZONTAL) {
 
 	// Set up the window
 	set_title("GT-10 Backing Track Cue");
@@ -30,6 +31,14 @@ MainWindow::MainWindow (JackClient * jc, Configuration * conf) :
 	set_default_size(640, 280);
 
 	updateText();
+
+	// Setup playback scale
+	positionScale.set_draw_value(false);
+	positionScale.set_range(0, 1);
+	//FIXME: GTK is currently broken for range widget update policies.......
+	//positionScale.set_update_policy(Gtk::UPDATE_DELAYED);
+	positionScale.signal_change_value().connect(sigc::mem_fun(*this,
+		&MainWindow::scaleChanged));	
 
 	// Start with horiz boxes
 	add(vbox3);
@@ -39,6 +48,7 @@ MainWindow::MainWindow (JackClient * jc, Configuration * conf) :
 	// Establish currently playing section
 	currentFileFrame.add(currentFileLabel);
 	vbox1.pack_start(currentFileFrame, Gtk::PACK_EXPAND_WIDGET);
+	vbox1.pack_start(positionScale, Gtk::PACK_EXPAND_WIDGET);
 
 	// Divide vbox2 vertically
 	vbox2.pack_start(hbox1, Gtk::PACK_EXPAND_WIDGET);
@@ -70,7 +80,7 @@ MainWindow::MainWindow (JackClient * jc, Configuration * conf) :
 
 	show_all_children();
 
-	// Update text when idle
+	// Update text and scale when idle
 	Glib::signal_idle().connect( sigc::mem_fun(*this, &MainWindow::updateText) );
 }
 
@@ -104,7 +114,12 @@ void MainWindow::midiButtonClicked() {
 	jackClient->toggleLearningMidi();
 }
 
+bool MainWindow::scaleChanged(Gtk::ScrollType scroll, double value) {
+	jackClient->setPosition(value * jackClient->getLength());
+}
+
 bool MainWindow::updateText() {
+	// Update Text
 	stringstream a, b, c;
 	a<<config->currentIndex;
 	b<<config->currentProgram;
@@ -164,6 +179,11 @@ bool MainWindow::updateText() {
 
 	if (jackClient->isLearning()) midiButton.set_label("Learning Midi");
 	else midiButton.set_label("Not Learning Midi");
+
+	// Update Scale
+	double value = static_cast <double> (jackClient->getPosition()) /
+		static_cast <double> (jackClient->getLength());
+	positionScale.set_value(value);
 
 	while (Gtk::Main::events_pending())
 		Gtk::Main::iteration(false);
