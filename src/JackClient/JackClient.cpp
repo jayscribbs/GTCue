@@ -92,7 +92,7 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 			position++;
 			outputRight[i] = cueBufferPtr[position];
 			position++;
-			if (position == sndfileinfo.frames) {
+			if (position == sndfileinfo.frames * sndfileinfo.channels) {
 				this->setPause();
 				position = 0;
 			}
