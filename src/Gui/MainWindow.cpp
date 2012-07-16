@@ -14,6 +14,8 @@ MainWindow::MainWindow (JackClient * jc, Configuration * conf) :
 	programFrame("Program"),
 	currentFileFrame("Cued File"),
 	bankFrame("Bank"),
+	volumeFrame("Volume"),
+	positionFrame("Position"),
 	vbox1(Gtk::ORIENTATION_VERTICAL, 5),
 	vbox2(Gtk::ORIENTATION_VERTICAL, 5),
 	vbox3(Gtk::ORIENTATION_VERTICAL, 5),
@@ -23,7 +25,8 @@ MainWindow::MainWindow (JackClient * jc, Configuration * conf) :
 	playButton("Play/Pause"),
 	newFileButton("New File This Patch"),
 	midiButton("Not Learning Midi"),	
-	positionScale(Gtk::ORIENTATION_HORIZONTAL) {
+	positionScale(Gtk::ORIENTATION_HORIZONTAL),
+	volumeScale(Gtk::ORIENTATION_HORIZONTAL) {
 
 	// Set up the window
 	set_title("GT-10 Backing Track Cue");
@@ -38,7 +41,16 @@ MainWindow::MainWindow (JackClient * jc, Configuration * conf) :
 	//FIXME: GTK is currently broken for range widget update policies.......
 	//positionScale.set_update_policy(Gtk::UPDATE_DELAYED);
 	positionScale.signal_change_value().connect(sigc::mem_fun(*this,
-		&MainWindow::scaleChanged));	
+		&MainWindow::positionScaleChanged));
+	
+	// Setup volume scale
+	volumeScale.set_draw_value(false);
+	volumeScale.set_range(0,1.2);
+	volumeScale.set_value(1);
+	volumeScale.add_mark(1, Gtk::POS_TOP, "100%");
+	//FIXME (SEE ABOVE)
+	volumeScale.signal_change_value().connect(sigc::mem_fun(*this,
+		&MainWindow::volumeScaleChanged));
 
 	// Start with horiz boxes
 	add(vbox3);
@@ -47,8 +59,11 @@ MainWindow::MainWindow (JackClient * jc, Configuration * conf) :
 
 	// Establish currently playing section
 	currentFileFrame.add(currentFileLabel);
+	volumeFrame.add(volumeScale);
+	positionFrame.add(positionScale);
 	vbox1.pack_start(currentFileFrame, Gtk::PACK_EXPAND_WIDGET);
-	vbox1.pack_start(positionScale, Gtk::PACK_EXPAND_WIDGET);
+	vbox1.pack_start(volumeFrame, Gtk::PACK_EXPAND_WIDGET);
+	vbox1.pack_start(positionFrame, Gtk::PACK_EXPAND_WIDGET);
 
 	// Divide vbox2 vertically
 	vbox2.pack_start(hbox1, Gtk::PACK_EXPAND_WIDGET);
@@ -114,8 +129,12 @@ void MainWindow::midiButtonClicked() {
 	jackClient->toggleLearningMidi();
 }
 
-bool MainWindow::scaleChanged(Gtk::ScrollType scroll, double value) {
+bool MainWindow::positionScaleChanged(Gtk::ScrollType scroll, double value) {
 	jackClient->setPosition(value * jackClient->getLength());
+}
+
+bool MainWindow::volumeScaleChanged(Gtk::ScrollType scroll, double value) {
+	jackClient->setVolume(value);
 }
 
 bool MainWindow::updateText() {

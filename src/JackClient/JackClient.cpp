@@ -18,6 +18,7 @@ JackClient::JackClient (const char * name,
 	playback(false),
 	fileCued(false),
 	learningMidi(false),
+	volume(1),
 	config(conf) {
 
 	// Open the jack client
@@ -76,9 +77,9 @@ int JackClient::jackProcess(jack_nframes_t nframes) {
 		
 		// Write data to jackd
 		for (int i = 0; i < nframes; i++) {
-			outputLeft[i] = cueBufferPtr[position];
+			outputLeft[i] = cueBufferPtr[position] * volume;
 			position++;
-			outputRight[i] = cueBufferPtr[position];
+			outputRight[i] = cueBufferPtr[position] * volume;
 			position++;
 			if (position >= (sndfileinfo.frames * sndfileinfo.channels)) {
 				this->setPause();
@@ -222,4 +223,9 @@ void JackClient::setPosition(int value) {
 
 int JackClient::getLength() {
 	return sndfileinfo.frames * sndfileinfo.channels;
+}
+
+void JackClient::setVolume(double value) {
+	volume = value;
+	if (volume > 1.2) volume = 1.2;
 }

@@ -33,6 +33,7 @@ class JackClient {
 		int getLength();
 		void setPause();
 		void setPlay();
+		void setVolume(double value);
 		void togglePlay();
 
 		// MIDI processing
@@ -57,6 +58,7 @@ class JackClient {
 		SNDFILE * sndfile;
 		SF_INFO sndfileinfo;
 		int position;
+		double volume;
 
 		//Configuration Object Pointer
 		Configuration * config;

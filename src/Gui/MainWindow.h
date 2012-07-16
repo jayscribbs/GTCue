@@ -22,7 +22,8 @@ class MainWindow : public Gtk::Window {
 		void midiButtonClicked();
 
 		// Scale change method
-		bool scaleChanged(Gtk::ScrollType scroll, double value);
+		bool positionScaleChanged(Gtk::ScrollType scroll, double value);
+		bool volumeScaleChanged(Gtk::ScrollType scroll, double value);
 
 	protected:
 		JackClient * jackClient;
@@ -38,7 +39,9 @@ class MainWindow : public Gtk::Window {
 				programFrame,
 				currentFileFrame,
 				buttonFrame,
-				bankFrame;
+				bankFrame,
+				positionFrame,
+				volumeFrame;
 		
 		// Boxes
 		Gtk::Box	vbox1,
@@ -56,5 +59,6 @@ class MainWindow : public Gtk::Window {
 
 		//Scale
 		Gtk::Scale	positionScale;
+		Gtk::Scale	volumeScale;
 };		
 #endif
