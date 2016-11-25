@@ -6,5 +6,3 @@ libtool
 libgtkmm-3.0-dev
 libsndfile1
 libjack-dev
-
-REWORK
